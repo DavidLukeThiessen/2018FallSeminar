@@ -10,10 +10,11 @@ bibliography: bibliography.bibtex
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-## The Basic Statistics
+## R Markdown
 
-In the basic statistical structure, there is a "population" consisting of all individuals we are interested in. Each individual has some characteristic, like what their weight is. We want to know and understand some property of the population, for example the average weight, but weighing everyone in the population would take too much time and/or be too expensive.
+This is an R Markdown presentation. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document.
 
 ## Slide with Bullets
 
