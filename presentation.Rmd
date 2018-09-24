@@ -12,8 +12,13 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ## The Basic Statistics
 
-In the basic statistical structure, there is a "population" consisting of all individuals we are interested in. Each individual has some characteristic, like what their weight is. We want to know and understand some property of the population, for example the average weight, but weighing everyone in the population would take too much time and/or be too expensive.
+In the basic statistical structure, there is a "population" consisting of a collection of individuals. We are interested in studying some aspect of the population
 
+Our approach is to randomly select a portion of the population, and 
+
+## A First Example
+
+There is a population of 
 
 ## Slide with Bullets
 
@@ -33,6 +38,10 @@ summary(cars)
 ```{r pressure}
 plot(pressure)
 ```
+
+## SLIDE NAME 
+
+Data
 
 ## Another slide I made
 
