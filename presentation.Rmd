@@ -11,21 +11,89 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 
 ## The Basic Statistics
+In the basic statistical structure, there is a "population" consisting of a collection of individuals. We are interested in studying some aspect of the population (commonly a single characteristic or a relation between several characteristics), but for reasons of cost/time/convenience, are unable to take an observation from every individual.
 
-In the basic statistical structure, there is a "population" consisting of a collection of individuals. We are interested in studying some aspect of the population
+Our approach is to randomly select a portion of the population, record observations from these individuals, then make generalizations to the rest of the population.
 
-Our approach is to randomly select a portion of the population, and 
+## Example
+A healthcare worker at a retirement home with 100 residents wants to know if the residents have high blood pressure. If they do, the retirement home should consider changing the menu to help improve their health. She randomly selects 30 residents to record their blood pressure.
 
-## A First Example
+The estimate of average blood pressure is:
 
-There is a population of 
+\begin{equation}
+\bar{x} = \frac{1}{n}\sum_{i=1}^{30} x_i
+\end{equation}
 
-## Slide with Bullets
+and (under typical assumptions) the confidence interval would be:
 
-- Bullet 1
-- Bullet 2
-    - Four spaces makes double indent
-- Bullet 3
+\begin{equation}
+(\bar{x} - z_{\alpha/2}\frac{s^{2}}{\sqrt{n}}, \, \bar{x} + z_{\alpha/2}\frac{s^{2}}{\sqrt{n}})
+\end{equation}
+
+
+## The Problem
+Some of the retirees are stubborn, and won't let the healthcare worker measure their blood pressure.
+
+How should the worker calculate the estimate and confidence interval?
+
+Remark: Missingness is a nuisance, not the objective of scientific study.
+
+
+## Notation
+TODO: Details Here
+
+R as missing data pattern as the indicator of missingness.
+
+Y as the full data, with covariates and response. (Or Y as response, X as covariates, both not necessarily observed.)
+
+
+
+## Types of Missing Data
+TODO: Formulas Here, probably split into 2 slides
+
+In order for us to decide how to deal with the missing data, we need to know what causes it. There are three types of missing patterns considered.
+
+Missing Completely at Random (MCAR)
+
+- Missingness is uncorrelated with the response. 
+
+Missing at Random (MAR)
+
+- Missingness is conditionally independent of the response, given
+
+Not Missing at Random (NMAR)
+
+- Neither of the two above conditions hold
+
+## Types of Missing Data
+Monotone Vs Non-Monotone
+
+TODO: Include graph showing dropout as illustration
+
+
+## Examples
+TODO: 1? example of each type here. possible audience participation
+
+## Approaches for Analyzing with Missing Data
+
+- Complete Case Analysis (CC)
+    - Throw out the individuals with missing data, and do an analysis as if you had only measured n' individuals instead of the originally planned n.
+- Inverse Probability Weighting (IPW)
+    - Weight the different individuals differently in the analysis, making ones with rare observations carry more weight
+- Single Imputation (SI)
+    - Replace the missing values with other appropriately selected values.
+- Multiple Imputation (MI)
+    - Replace missing values with randomly (but appropriately) selected values, but repeate this many times and then combine the conclusions together in a principled way.
+
+
+
+
+
+
+
+
+
+
 
 ## Slide with R Output
 
