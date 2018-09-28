@@ -1,8 +1,11 @@
 ---
 title: "Modelling Missing Data"
 author: "David Luke Thiessen"
-date: "September 19, 2018"
-output: beamer_presentation
+date: "October 15, 2018"
+output: 
+  beamer_presentation:
+   includes:
+      in_header: headerpagenumbers.tex
 bibliography: bibliography.bibtex
 ---
 
@@ -10,12 +13,21 @@ bibliography: bibliography.bibtex
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-## The Basic Statistics
+
+## Outline
+- Introduction 
+- Background on Missing Data Mechanisms
+- Techniques for Correcting Bias / Variance
+- Inverse Probability Weighting
+- Methods for Modelling Missing Data Probabilities
+
+## Introduction
 In the basic statistical structure, there is a "population" consisting of a collection of individuals. We are interested in studying some aspect of the population (commonly a single characteristic or a relation between several characteristics), but for reasons of cost/time/convenience, are unable to take an observation from every individual.
 
 Our approach is to randomly select a portion of the population, record observations from these individuals, then make generalizations to the rest of the population.
 
-## Example
+
+## Introduction: Example
 A healthcare worker at a retirement home with 100 residents wants to know if the residents have high blood pressure. If they do, the retirement home should consider changing the menu to help improve their health. She randomly selects 30 residents to record their blood pressure.
 
 The estimate of average blood pressure is:
@@ -27,11 +39,11 @@ The estimate of average blood pressure is:
 and (under typical assumptions) the confidence interval would be:
 
 \begin{equation}
-(\bar{x} - z_{\alpha/2}\frac{s^{2}}{\sqrt{n}}, \, \bar{x} + z_{\alpha/2}\frac{s^{2}}{\sqrt{n}})
+(\bar{x} - z_{\alpha/2}\frac{s}{\sqrt{n}}, \, \bar{x} + z_{\alpha/2}\frac{s}{\sqrt{n}})
 \end{equation}
 
 
-## The Problem
+## Introduction: The Problem
 Some of the retirees are stubborn, and won't let the healthcare worker measure their blood pressure.
 
 How should the worker calculate the estimate and confidence interval?
@@ -39,42 +51,68 @@ How should the worker calculate the estimate and confidence interval?
 Remark: Missingness is a nuisance, not the objective of scientific study.
 
 
-## Notation
+## Background: Missing Data Patterns
+TODO: Include graph showing dropout as illustration
+
+Monotone Vs Non-Monotone
+
+
+## Background: Examples of Missing Patterns
+TODO: 1? example of each type here. possible audience participation
+
+Merge with previous slide based on time?
+
+
+## Background: Notation
 TODO: Details Here
 
-R as missing data pattern as the indicator of missingness.
+R as missing data pattern as the indicator of missingness. R = 1 for full observed individual. 
 
-Y as the full data, with covariates and response. (Or Y as response, X as covariates, both not necessarily observed.)
+Y as the full data, with covariates and response. (Or Y as response, X as covariates, both not necessarily observed?)
+
+- Full data
+- Observed data
 
 
-
-## Types of Missing Data
+## Background: Missing Data Mechanisms
 TODO: Formulas Here, probably split into 2 slides
 
 In order for us to decide how to deal with the missing data, we need to know what causes it. There are three types of missing patterns considered.
 
 Missing Completely at Random (MCAR)
 
-- Missingness is uncorrelated with the response. 
+- Missingness is independent of the data.
 
 Missing at Random (MAR)
 
-- Missingness is conditionally independent of the response, given
+- Missingness can depend on data values that are observed, but not those that are unobserved.
 
 Not Missing at Random (NMAR)
 
-- Neither of the two above conditions hold
-
-## Types of Missing Data
-Monotone Vs Non-Monotone
-
-TODO: Include graph showing dropout as illustration
+- Neither of the two above conditions hold.
 
 
-## Examples
-TODO: 1? example of each type here. possible audience participation
+## Background: Examples of Missing Data Mechanisms
+TODO:
+
+This slide will be the "intuitive" examples
+
+Common Examples:
+- Equipment fails randomly, regardless of who is being measured
+- Newer residents don't trust the healthcare worker and are more likely to refuse
+- The measurement device won't record results over a certain threshold
+
+
+## Background: Examples of Missing Data Mechanisms
+TODO:
+
+This slide will have the setting used for simulation/illustration of the following approaches.
+
+Probably just details about the previous examples, something like Normally distributed, but missing values depending on ......
+
 
 ## Approaches for Analyzing with Missing Data
+TODO: 
 
 - Complete Case Analysis (CC)
     - Throw out the individuals with missing data, and do an analysis as if you had only measured n' individuals instead of the originally planned n.
@@ -82,17 +120,31 @@ TODO: 1? example of each type here. possible audience participation
     - Weight the different individuals differently in the analysis, making ones with rare observations carry more weight
 - Single Imputation (SI)
     - Replace the missing values with other appropriately selected values.
+    - Sometimes the average is used. In many situations this is wrong.
 - Multiple Imputation (MI)
-    - Replace missing values with randomly (but appropriately) selected values, but repeate this many times and then combine the conclusions together in a principled way.
+    - Replace missing values with randomly (but appropriately) selected values, but repeat this many times and then combine the conclusions together in a principled way.
+    
+- Likelihood Methods?
 
 
+## Demonstration
+TODO: Everything after here
+
+- Show that CC analysis is only unbiased for MCAR
+- IPW and MI can correct for MAR, but not for NMAR
+- Discuss efficiency
 
 
+## Inverse Probability Weighting
+- Efficiency
+- Easier to specify than full likelihood
+- Less compuation demanding?
 
 
-
-
-
+## Modelling Missing Data Probability
+- Logistic
+- Multinomial with only a few missing patterns and lots of data
+- UMLE and CBE from Paper
 
 
 ## Slide with R Output
@@ -107,10 +159,6 @@ summary(cars)
 plot(pressure)
 ```
 
-## SLIDE NAME 
-
-Data
-
 ## Another slide I made
 
 A sample Latex Equation
@@ -119,7 +167,7 @@ A sample Latex Equation
 X = \sum_{i = 1}^{5} y_i
 \end{equation}
 
-## Why does this look different?
+## Reference Example
 
 More sample text [see @Nobody06].
 
