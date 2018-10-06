@@ -1,5 +1,5 @@
 ---
-title: "Modelling Missing Data"
+title: "Models for Non-Monotone Missing at Random Data"
 author: "David Luke Thiessen"
 date: "October 15, 2018"
 output: 
@@ -32,23 +32,25 @@ A healthcare worker at a retirement home with 100 residents wants to know if the
 
 The estimate of average blood pressure is:
 
-\begin{equation}
+\begin{math}
 \bar{x} = \frac{1}{n}\sum_{i=1}^{30} x_i
-\end{equation}
+\end{math}
 
 and (under typical assumptions) the confidence interval would be:
 
-\begin{equation}
+\begin{math}
 (\bar{x} - z_{\alpha/2}\frac{s}{\sqrt{n}}, \, \bar{x} + z_{\alpha/2}\frac{s}{\sqrt{n}})
-\end{equation}
+\end{math}
 
 
 ## Introduction: The Problem
-Some of the retirees are stubborn, and won't let the healthcare worker measure their blood pressure.
+Some of the retirees refuse, and won't let the healthcare worker measure their blood pressure.
 
 How should the worker calculate the estimate and confidence interval?
 
 Remark: Missingness is a nuisance, not the objective of scientific study.
+
+Question: Can auxillary information be used to recover (or estimate) the missing information?
 
 
 ## Background: Missing Data Patterns
@@ -77,7 +79,7 @@ Y as the full data, with covariates and response. (Or Y as response, X as covari
 ## Background: Missing Data Mechanisms
 TODO: Formulas Here, probably split into 2 slides
 
-In order for us to decide how to deal with the missing data, we need to know what causes it. There are three types of missing patterns considered.
+In order for us to decide how to deal with the missing data, we need to know what causes it. There are three types of missing mechanisms
 
 Missing Completely at Random (MCAR)
 
@@ -87,7 +89,7 @@ Missing at Random (MAR)
 
 - Missingness can depend on data values that are observed, but not those that are unobserved.
 
-Not Missing at Random (NMAR)
+Missing Not at Random (MNAR)
 
 - Neither of the two above conditions hold.
 
@@ -130,8 +132,10 @@ TODO:
 ## Demonstration
 TODO: Everything after here
 
-- Show that CC analysis is only unbiased for MCAR
-- IPW and MI can correct for MAR, but not for NMAR
+- Show that CC analysis is unbiased for MCAR
+- IPW and MI can correct for MAR, but not for MRAR
+- Even if MNAR, it's better to treat as MAR then MCAR.
+- Non identifiability of MNAR
 - Discuss efficiency
 
 
