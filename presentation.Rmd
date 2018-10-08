@@ -16,7 +16,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ## Outline
 - Introduction 
-- Background on Missing Data Mechanisms
+- Background on Missing Data Theory
 - Techniques for Correcting Bias / Variance
 - Inverse Probability Weighting
 - Methods for Modelling Missing Data Probabilities
@@ -32,15 +32,15 @@ A healthcare worker at a retirement home with 100 residents wants to know if the
 
 The estimate of average blood pressure is:
 
-\begin{math}
+\begin{equation}
 \bar{x} = \frac{1}{n}\sum_{i=1}^{30} x_i
-\end{math}
+\end{equation}
 
 and (under typical assumptions) the confidence interval would be:
 
-\begin{math}
+\begin{equation}
 (\bar{x} - z_{\alpha/2}\frac{s}{\sqrt{n}}, \, \bar{x} + z_{\alpha/2}\frac{s}{\sqrt{n}})
-\end{math}
+\end{equation}
 
 
 ## Introduction: The Problem
@@ -53,60 +53,91 @@ Remark: Missingness is a nuisance, not the objective of scientific study.
 Question: Can auxillary information be used to recover (or estimate) the missing information?
 
 
-## Background: Missing Data Patterns
-TODO: Include graph showing dropout as illustration
+## Introduction: A Naive Approach
+Suppose that the healthcare worker decides to just ignore the residents who refuse to have their blood pressure recorded. She considers them as if they were not selected to be in the sample and estimates the average as:
 
-Monotone Vs Non-Monotone
+\begin{equation}
+\bar{x} = \frac{1}{|J|}\sum_{i \in J} x_i
+\end{equation}
 
+Where J is the set of residents in the sample who let their blood pressure be recorded.
 
-## Background: Examples of Missing Patterns
-TODO: 1? example of each type here. possible audience participation
+Will this approach give an accurate estimate?
 
-Merge with previous slide based on time?
+Answer: It depends, but in general this estimate is biased.
 
 
 ## Background: Notation
-TODO: Details Here
+As in @SunBaoluo2017OIPW, we let $X = (X_1, X_2, ..., X_K)$ be a random vector representing the complete (fully observed) data.
 
-R as missing data pattern as the indicator of missingness. R = 1 for full observed individual. 
+Let $R$ be an integer between $1$ and $2^K$ denoting which of the variables $X_i$ are observed, with $R = 1$ indicating that all variables observed and $R = r > 1$ denoting that only the variables $X_{(r)} \subset X$ are observed (which could be the empty set).
 
-Y as the full data, with covariates and response. (Or Y as response, X as covariates, both not necessarily observed?)
+Each individual is an independent and identically distributed observation from the random variable $(R_i, X_{(R)i})$. 
 
-- Full data
-- Observed data
 
+## Background: Missing Data Patterns
+If the variables $X_i$ can be arranged such that $L_{(r+1)} \subset L_{(r)}$, then the data are said to have a monotone missing pattern. This is common in lifetime studies.
+
+```{r}
+X = c(6,4,4,3,2)
+barplot(X,axes=FALSE,main="Monotone Missing",names.arg=c("X1","X2","X3","X4","X5"),density=c(rep(20,5)))
+```
+
+
+## Background: Missing Data Patterns
+If the variables are not monotone missing, then they are non-monontone missing.
+
+```{r}
+X = c(6,4,4,3,2)
+barplot(X,axes=FALSE,main="Non-monotone Missing",names.arg=c("X1","X2","X3","X4","X5"),density=c(rep(20,5)))
+rect(xleft = 2.6, ybottom = 5, xright = 3.6, ytop = 6, density = 20,lwd=0.6)
+rect(xleft = 5, ybottom = 3, xright = 6, ytop = 5, density = 20,lwd=0.6)
+```
 
 ## Background: Missing Data Mechanisms
-TODO: Formulas Here, probably split into 2 slides
-
-In order for us to decide how to deal with the missing data, we need to know what causes it. There are three types of missing mechanisms
-
 Missing Completely at Random (MCAR)
 
 - Missingness is independent of the data.
+- Example: The device the healthcare worker is using to record blood pressure is faulty, and the device randomly fails.
 
 Missing at Random (MAR)
 
 - Missingness can depend on data values that are observed, but not those that are unobserved.
+- Example: The residents are more likely to refuse the healthcare worker the older they are (and the worker has a list of the ages of residents).
+
+Missing Not at Random (MNAR)
+
+- Neither of the two above conditions hold.
+- Example: Residents with high blood pressure are more likely to refuse to have their blood pressure recorded.
+
+
+## Background: Missing Data Mechanisms
+Missing Completely at Random (MCAR)
+
+\begin{equation}
+P(R = r|l,\gamma) = P(R=r|\gamma)
+\end{equation}
+
+Missing at Random (MAR)
+
+\begin{equation}
+P(R=r|l,\gamma) = P(R=r|l^{\text{obs}},\gamma)
+\end{equation}
 
 Missing Not at Random (MNAR)
 
 - Neither of the two above conditions hold.
 
+Remark: We also need to make the assumption that:
+
+\begin{equation}
+P(R = r|l,\gamma) > \sigma > 0
+\end{equation}
+
+for some constant $\sigma$ and all possible $l$.
 
 ## Background: Examples of Missing Data Mechanisms
-TODO:
-
-This slide will be the "intuitive" examples
-
-Common Examples:
-- Equipment fails randomly, regardless of who is being measured
-- Newer residents don't trust the healthcare worker and are more likely to refuse
-- The measurement device won't record results over a certain threshold
-
-
-## Background: Examples of Missing Data Mechanisms
-TODO:
+Suppose that the data in question is $(X_1,X_2) \sim \text{N}(\mu,\Sigma)$, and the research objective is to study 
 
 This slide will have the setting used for simulation/illustration of the following approaches.
 
@@ -150,18 +181,6 @@ TODO: Everything after here
 - Multinomial with only a few missing patterns and lots of data
 - UMLE and CBE from Paper
 
-
-## Slide with R Output
-
-```{r cars, echo = TRUE}
-summary(cars)
-```
-
-## Slide with Plot
-
-```{r pressure}
-plot(pressure)
-```
 
 ## Another slide I made
 
