@@ -17,9 +17,10 @@ knitr::opts_chunk$set(echo = FALSE)
 ## Outline
 - Introduction 
 - Background on Missing Data Theory
-- Techniques for Correcting Bias / Variance
+- Approaches for Analyzing Missing Data
 - Inverse Probability Weighting
 - Methods for Modelling Missing Data Probabilities
+
 
 ## Introduction
 In the basic statistical structure, there is a "population" consisting of a collection of individuals. We are interested in studying some aspect of the population (commonly a single characteristic or a relation between several characteristics), but for reasons of cost/time/convenience, are unable to take an observation from every individual.
@@ -50,7 +51,7 @@ How should the worker calculate the estimate and confidence interval?
 
 Remark: Missingness is a nuisance, not the objective of scientific study.
 
-Question: Can auxillary information be used to recover (or estimate) the missing information?
+Question: Can auxillary information (like the age of the residents) be used to recover (or estimate) the missing information?
 
 
 ## Introduction: A Naive Approach
@@ -70,13 +71,13 @@ Answer: It depends, but in general this estimate is biased.
 ## Background: Notation
 As in @SunBaoluo2017OIPW, we let $X = (X_1, X_2, ..., X_K)$ be a random vector representing the complete (fully observed) data.
 
-Let $R$ be an integer between $1$ and $2^K$ denoting which of the variables $X_i$ are observed, with $R = 1$ indicating that all variables observed and $R = r > 1$ denoting that only the variables $X_{(r)} \subset X$ are observed (which could be the empty set).
+Let $R$ be an integer variable denoting which of the $X_i$ variables have been observed, with $1 \leq R \leq 2^K$. Let $R = 1$ indicate that all variables observed and $R = r > 1$ denote that only the variables $X_{(r)} \subset X$ are observed (which could be the empty set).
 
 Each individual is an independent and identically distributed observation from the random variable $(R_i, X_{(R)i})$. 
 
 
 ## Background: Missing Data Patterns
-If the variables $X_i$ can be arranged such that $L_{(r+1)} \subset L_{(r)}$, then the data are said to have a monotone missing pattern. This is common in lifetime studies.
+If the variables $X_i$ can be arranged such that $X_{(r+1)} \subset X_{(r)}$, then the data are said to have a monotone missing pattern. This is common in long-term studies where participants drop out part-way through.
 
 ```{r}
 X = c(6,4,4,3,2)
@@ -94,54 +95,56 @@ rect(xleft = 2.6, ybottom = 5, xright = 3.6, ytop = 6, density = 20,lwd=0.6)
 rect(xleft = 5, ybottom = 3, xright = 6, ytop = 5, density = 20,lwd=0.6)
 ```
 
+
 ## Background: Missing Data Mechanisms
 Missing Completely at Random (MCAR)
 
 - Missingness is independent of the data.
-- Example: The device the healthcare worker is using to record blood pressure is faulty, and the device randomly fails.
+- Example: The device the healthcare worker is using to record blood pressure is faulty, and the device randomly fails when trying to use it on some residents.
 
+\begin{equation}
+\pi_r(x) = P(R = r|x,\gamma) = P(R=r|\gamma)
+\end{equation}
+
+
+## Background: Missing Data Mechanisms
 Missing at Random (MAR)
 
 - Missingness can depend on data values that are observed, but not those that are unobserved.
 - Example: The residents are more likely to refuse the healthcare worker the older they are (and the worker has a list of the ages of residents).
 
+\begin{equation}
+\pi_r(x) = P(R=r|x,\gamma) = P(R=r|x^{\text{obs}},\gamma)
+\end{equation}
+
+
+## Background: Missing Data Mechanisms
 Missing Not at Random (MNAR)
 
 - Neither of the two above conditions hold.
 - Example: Residents with high blood pressure are more likely to refuse to have their blood pressure recorded.
 
 
-## Background: Missing Data Mechanisms
-Missing Completely at Random (MCAR)
-
-\begin{equation}
-P(R = r|l,\gamma) = P(R=r|\gamma)
-\end{equation}
-
-Missing at Random (MAR)
-
-\begin{equation}
-P(R=r|l,\gamma) = P(R=r|l^{\text{obs}},\gamma)
-\end{equation}
-
-Missing Not at Random (MNAR)
-
-- Neither of the two above conditions hold.
-
-Remark: We also need to make the assumption that:
-
-\begin{equation}
-P(R = r|l,\gamma) > \sigma > 0
-\end{equation}
-
-for some constant $\sigma$ and all possible $l$.
-
 ## Background: Examples of Missing Data Mechanisms
-Suppose that the data in question is $(X_1,X_2) \sim \text{N}(\mu,\Sigma)$, and the research objective is to study 
+Suppose that the data in question is $(X_1,X_2) \sim \text{N}(\mu,\Sigma)$, where $\mu = (1,1)$, $\Sigma = \bigl( \begin{smallmatrix} 1 & 0.5 \\ 0.5 & 1\end{smallmatrix}\bigr)$ and the research objective is to study the variable $X_2$.
 
-This slide will have the setting used for simulation/illustration of the following approaches.
+Let $X_1$ be always observed, and $X_2$ partially missing with the mechanism given by:
 
-Probably just details about the previous examples, something like Normally distributed, but missing values depending on ......
+- MCAR: $P(R=2|x,\gamma) = P(R=2) = 0.4$
+
+- MAR: $P(R=2|x,\gamma) = P(R=2|x_1) = 1/(1+e^{x_1})$
+
+- MNAR: $P(R=2|x,\gamma) = P(R=2|x_2) = 1/(1+e^{x_2})$
+
+
+## Background: Missing Data Mechanisms
+Remark: For technical reasons, we also need to make the assumption that:
+
+\begin{equation}
+\pi_1(x) = P(R = 1|x,\gamma) > \sigma > 0
+\end{equation}
+
+for some constant $\sigma$ and all possible $x$.
 
 
 ## Approaches for Analyzing with Missing Data
@@ -161,13 +164,28 @@ TODO:
 
 
 ## Demonstration
-TODO: Everything after here
+TODO: Everything after here, use the MVN example.
 
-- Show that CC analysis is unbiased for MCAR
-- IPW and MI can correct for MAR, but not for MRAR
-- Even if MNAR, it's better to treat as MAR then MCAR.
-- Non identifiability of MNAR
-- Discuss efficiency
+
+## Show that CC is unbiased for MCAR
+
+
+## Show that CC is biased for MAR and MNAR
+
+
+## Demostrate how IPW can correct for MAR
+
+
+## Show how IPW Improves MNAR
+
+
+## Another example with MNAR where IPW cannot correct for bias.
+
+
+## Single Imputation - Doesn't correct the bias, gives a false sense of security by reducing the variance
+
+
+## Demonstrate how Multiple Impuation works?
 
 
 ## Inverse Probability Weighting
@@ -182,19 +200,6 @@ TODO: Everything after here
 - UMLE and CBE from Paper
 
 
-## Another slide I made
-
-A sample Latex Equation
-
-\begin{equation}
-X = \sum_{i = 1}^{5} y_i
-\end{equation}
-
-## Reference Example
-
-More sample text [see @Nobody06].
-
-The name of the reference is case sensitive. 
 
 ## References
 
