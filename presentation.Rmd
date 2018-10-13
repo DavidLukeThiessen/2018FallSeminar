@@ -7,12 +7,13 @@ output:
    includes:
       in_header: headerpagenumbers.tex
 bibliography: bibliography.bibtex
+nocite: | 
+  @LittleRoderickJ.A.2002SAwM
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 ```
-
 
 ## Outline
 - Introduction 
@@ -22,6 +23,8 @@ knitr::opts_chunk$set(echo = FALSE)
 - Methods for Modelling Missing Data Probabilities
 
 
+
+
 ## Introduction
 In the basic statistical structure, there is a "population" consisting of a collection of individuals. We are interested in studying some aspect of the population (commonly a single characteristic or a relation between several characteristics), but for reasons of cost/time/convenience, are unable to take an observation from every individual.
 
@@ -29,7 +32,7 @@ Our approach is to randomly select a portion of the population, record observati
 
 
 ## Introduction: Example
-A healthcare worker at a retirement home with 100 residents wants to know if the residents have high blood pressure. If they do, the retirement home should consider changing the menu to help improve their health. She randomly selects 30 residents to record their blood pressure.
+A retirement home has 100 residents and we want to know if the residents have high blood pressure. We randomly selects 30 residents to record their blood pressure.
 
 The estimate of average blood pressure is:
 
@@ -45,9 +48,9 @@ and (under typical assumptions) the confidence interval would be:
 
 
 ## Introduction: The Problem
-Some of the retirees refuse, and won't let the healthcare worker measure their blood pressure.
+Some of the retirees refuse, and won't let us measure their blood pressure.
 
-How should the worker calculate the estimate and confidence interval?
+How should we calculate the estimate and confidence interval?
 
 Remark: Missingness is a nuisance, not the objective of scientific study.
 
@@ -55,7 +58,7 @@ Question: Can auxillary information (like the age of the residents) be used to r
 
 
 ## Introduction: A Naive Approach
-Suppose that the healthcare worker decides to just ignore the residents who refuse to have their blood pressure recorded. She considers them as if they were not selected to be in the sample and estimates the average as:
+We could decide to ignore the residents who refuse and estimates the average as:
 
 \begin{equation}
 \bar{x} = \frac{1}{|J|}\sum_{i \in J} x_i
@@ -77,7 +80,7 @@ Each individual is an independent and identically distributed observation from t
 
 
 ## Background: Missing Data Patterns
-If the variables $X_i$ can be arranged such that $X_{(r+1)} \subset X_{(r)}$, then the data are said to have a monotone missing pattern. This is common in long-term studies where participants drop out part-way through.
+If the variables $X_i$ can be arranged such that $X_{(r+1)} \subset X_{(r)}$, then the data are said to have a monotone missing pattern. 
 
 ```{r}
 X = c(6,4,4,3,2)
@@ -100,7 +103,7 @@ rect(xleft = 5, ybottom = 3, xright = 6, ytop = 5, density = 20,lwd=0.6)
 Missing Completely at Random (MCAR)
 
 - Missingness is independent of the data.
-- Example: The device the healthcare worker is using to record blood pressure is faulty, and the device randomly fails when trying to use it on some residents.
+- Example: The device we are using to record blood pressure is faulty, and the device randomly fails when trying to use it on some residents.
 
 \begin{equation}
 \pi_r(x) = P(R = r|x,\gamma) = P(R=r|\gamma)
@@ -111,7 +114,7 @@ Missing Completely at Random (MCAR)
 Missing at Random (MAR)
 
 - Missingness can depend on data values that are observed, but not those that are unobserved.
-- Example: The residents are more likely to refuse the healthcare worker the older they are (and the worker has a list of the ages of residents).
+- Example: The residents are more likely to refuse the older they are (and the worker has a list of the ages of residents).
 
 \begin{equation}
 \pi_r(x) = P(R=r|x,\gamma) = P(R=r|x^{\text{obs}},\gamma)
