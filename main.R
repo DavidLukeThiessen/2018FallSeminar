@@ -4,13 +4,13 @@ library(MASS)
 
 # Example 3 from Inference and Missing Data - Rubin, discussion
 # Column 1 is X, Column 2 is Y
-rm(list=ls())
 
+rm(list=ls())
 
 Sig = matrix(c(1,0.5,0.5,1),2,2)
 Mu = c(1,1)
 n = 30
-m = 500
+m = 1000
 
 mylogit=function(x){
   1/(1+exp(x))
@@ -30,15 +30,16 @@ mydatagen=function(){
 }
 
 
-SimResults = matrix(nrow = m,ncol = 6)
-colnames(SimResults)=c("CC MCAR","CC MAR","CC MNAR","IPW MCAR","IPW MAR","IPW MNAR")
+SimResults = matrix(nrow = m,ncol = 9)
+colnames(SimResults)=c("CC MCAR","CC MAR","CC MNAR","IPW MCAR","IPW MAR","IPW MNAR",
+                       "SI MCAR","SI MAR","SI MNAR")
 # SimResults
 
 for(i in 1:m){
   mydata = mydatagen()
   # mydata
   
-  c(sum(mydata[,3]),sum(mydata[,4]),sum(mydata[,5]))
+  # c(sum(mydata[,3]),sum(mydata[,4]),sum(mydata[,5]))
   
   # mydata[which(mydata[,3]==0),]
   # mydata[which(mydata[,4]==0),]
@@ -52,33 +53,73 @@ for(i in 1:m){
   
   
   ############# IPW Analysis
-  # Probability of it being 1 vs 0  ?
+  # model0 = glm(mydata[,3]~mydata[,1],family=binomial(link="logit"))
+  # probs0 = predict.glm(model0,type='response')
+  # # probs0 
+  # weight0 = n*probs0/sum(probs0)
+  # # weight0
+  # # sum(weight0)
+  # 
+  # model1 = glm(mydata[,4]~mydata[,1],family=binomial(link="logit"))
+  # probs1 = predict.glm(model1,type='response')
+  # # probs1 
+  # weight1 = n*probs1/sum(probs1)
+  # # weight1
+  # # sum(weight1)
+  # 
+  # model2 = glm(mydata[,5]~mydata[,1],family=binomial(link="logit"))
+  # probs2 = predict.glm(model2,type='response')
+  # # probs2 
+  # weight2 = n*probs2/sum(probs2)
+  # # weight2
+  # # sum(weight2)
+  # 
+  # SimResults[i,4] = mean(mydata[which(mydata[,3]==1),2]/weight0[which(mydata[,3]==1)])
+  # SimResults[i,5] = mean(mydata[which(mydata[,4]==1),2]/weight1[which(mydata[,4]==1)])
+  # SimResults[i,6] = mean(mydata[which(mydata[,5]==1),2]/weight2[which(mydata[,5]==1)])
   
+  # This tries the other weighting equation after (3.4) in SA with MD
   model0 = glm(mydata[,3]~mydata[,1],family=binomial(link="logit"))
   probs0 = predict.glm(model0,type='response')
-  # probs0 
-  weight0 = n*probs0/sum(probs0)
+  # probs0
+  # 1/probs0
+  # sum(1/probs0[which(mydata[,3]==1)])
+  weight0 = sum(mydata[,3])*(1/probs0)/sum((1/probs0[which(mydata[,3]==1)]))
   # weight0
   # sum(weight0)
   
   model1 = glm(mydata[,4]~mydata[,1],family=binomial(link="logit"))
   probs1 = predict.glm(model1,type='response')
-  # probs1 
-  weight1 = n*probs1/sum(probs1)
+  # probs1
+  weight1 = sum(mydata[,4])*(1/probs1)/sum((1/probs1[which(mydata[,4]==1)]))
   # weight1
   # sum(weight1)
   
   model2 = glm(mydata[,5]~mydata[,1],family=binomial(link="logit"))
   probs2 = predict.glm(model2,type='response')
   # probs2 
-  weight2 = n*probs2/sum(probs2)
+  weight2 = sum(mydata[,5])*(1/probs2)/sum((1/probs2[which(mydata[,5]==1)]))
   # weight2
   # sum(weight2)
   
-  SimResults[i,4] = mean(mydata[which(mydata[,3]==1),2]/weight0[which(mydata[,3]==1)])
-  SimResults[i,5] = mean(mydata[which(mydata[,4]==1),2]/weight1[which(mydata[,4]==1)])
-  SimResults[i,6] = mean(mydata[which(mydata[,5]==1),2]/weight2[which(mydata[,5]==1)])
+  SimResults[i,4] = mean(mydata[which(mydata[,3]==1),2]*weight0[which(mydata[,3]==1)])
+  SimResults[i,5] = mean(mydata[which(mydata[,4]==1),2]*weight1[which(mydata[,4]==1)])
+  SimResults[i,6] = mean(mydata[which(mydata[,5]==1),2]*weight2[which(mydata[,5]==1)])
   
+  
+  # Single Imputation of sample average
+  completed1 = ifelse(mydata[,3]==1,mydata[,2],mean(mydata[which(mydata[,3]==1),2]))
+  # completed1
+  # mydata[,c(2,3)]
+  # mean(completed1)
+  # mean(mydata[which(mydata[,3]==1),2])
+  # sd(completed1)
+  # sd(mydata[which(mydata[,3]==1),2])
+  completed2 = ifelse(mydata[,4]==1,mydata[,2],mean(mydata[which(mydata[,4]==1),2]))
+  completed3 = ifelse(mydata[,5]==1,mydata[,2],mean(mydata[which(mydata[,5]==1),2]))
+  SimResults[i,7]=mean(completed1)
+  SimResults[i,8]=mean(completed2)
+  SimResults[i,9]=mean(completed3)
   
 }
 
