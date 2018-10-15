@@ -30,12 +30,13 @@ mydatagen=function(){
 }
 
 
-SimResults = matrix(nrow = m,ncol = 9)
+SimResults = matrix(nrow = m,ncol = 12)
 colnames(SimResults)=c("CC MCAR","CC MAR","CC MNAR","IPW MCAR","IPW MAR","IPW MNAR",
-                       "SI MCAR","SI MAR","SI MNAR")
+                       "SI Mean MCAR","SI Mean MAR","SI Mean MNAR",
+                       "SI Reg MCAR", "SI Reg MAR", "SI Reg MNAR")
 # SimResults
 
-set.seed(3)
+set.seed(4)
 for(i in 1:m){
   mydata = mydatagen()
   # mydata
@@ -122,6 +123,30 @@ for(i in 1:m){
   SimResults[i,8]=mean(completed2)
   SimResults[i,9]=mean(completed3)
   
+  
+  
+  # Single Imputation of Conditional Mean
+  model4 = lm(X2~X1,data=mydata[which(mydata[,3]==1),])
+  predicted4 = predict(model4,newdata=data.frame(X1=mydata[,1]))
+  completed4 = ifelse(mydata[,3]==1,mydata[,2],predicted4)
+  # completed4
+  # mydata[,c(2,3)]
+  SimResults[i,10]=mean(completed4)
+  
+  model5 = lm(X2~X1,data=mydata[which(mydata[,4]==1),])
+  predicted5 = predict(model5,newdata=data.frame(X1=mydata[,1]))
+  completed5 = ifelse(mydata[,3]==1,mydata[,2],predicted5)
+  # completed4
+  # mydata[,c(2,3)]
+  SimResults[i,11]=mean(completed5)
+  
+  model6 = lm(X2~X1,data=mydata[which(mydata[,5]==1),])
+  predicted6 = predict(model6,newdata=data.frame(X1=mydata[,1]))
+  completed6 = ifelse(mydata[,3]==1,mydata[,2],predicted6)
+  # completed4
+  # mydata[,c(2,3)]
+  SimResults[i,12]=mean(completed6)
+  
 }
 save.image()
 head(SimResults)
@@ -132,9 +157,14 @@ apply(X=SimResults, MARGIN=2, FUN=sd)
 
 plot(mydata[,1],mydata[,4],xlab="X1",ylab="Missing Indicator")
 curve(predict(model1,data.frame(X1=x),type="resp"),add=TRUE)
+# model1
 
-model1
+
+# head(mydata)
 
 
-mydata
+
+
+
+
 

@@ -16,6 +16,7 @@ nocite: |
   @SunBaoluo2017OIPW
   @SchaferJosephL.2002MDOV
   @SeamanShaunR2013Roip
+  @ZhangDao-Qiang2003CIDU
 ---
 
 ```{r setup, include=FALSE}
@@ -26,6 +27,7 @@ knitr::opts_chunk$set(echo = FALSE)
 - Introduction 
 - Background on Missing Data Theory
 - Approaches for Analyzing Missing Data
+- Simulation Example
 - Inverse Probability Weighting
 - Methods for Modelling Missing Data Probabilities
 
@@ -42,13 +44,13 @@ A retirement home has 100 residents and we want to know if the residents have hi
 The estimate of average blood pressure is:
 
 \begin{equation}
-\bar{x} = \frac{1}{n}\sum_{i=1}^{30} x_i
+\bar{x} = \frac{1}{30}\sum_{i=1}^{30} x_i
 \end{equation}
 
 and (under typical assumptions) the confidence interval would be:
 
 \begin{equation}
-(\bar{x} - z_{\alpha/2}\frac{s}{\sqrt{n}}, \, \bar{x} + z_{\alpha/2}\frac{s}{\sqrt{n}})
+(\bar{x} - z_{\alpha/2}\frac{s}{\sqrt{30}}, \, \bar{x} + z_{\alpha/2}\frac{s}{\sqrt{30}})
 \end{equation}
 
 
@@ -166,12 +168,9 @@ for some constant $\sigma$ and all possible $x$.
     - Replace the missing values with new appropriately selected values.
     
 - Multiple Imputation (MI)
-    - Replace missing values with appropriately selected values, but repeat this many (typically > 20 times) and then combine the conclusions together.
+    - Replace missing values with appropriately selected values, but repeat this many (typically 5 - 20 times) and then combine the conclusions together.
     
-- Other Approaches: Maximum Likelihood 
-
-
-## Other Slides giving details on these methods??
+- Other Approaches: Maximum Likelihood, Matching
 
 
 ## Simulation: Setting
@@ -188,25 +187,21 @@ Let $X_1$ be always observed, and $X_2$ partially missing with the mechanism giv
 $n = 30$, number of simulations $= 1000$
 
 
-## Simulation: Complete Case Method
+## Simulation: Results
+```{r, include=TRUE,echo=TRUE}
+load(".Rdata")
+colMeans(SimResults[,c(1,2,3)])
+colMeans(SimResults[,c(4,5,6)])
+```
 
-\begin{equation}
-\bar{x_{2}} = \frac{1}{r}\sum_{i = 1}^{r} x_{i2}
-\end{equation}
 
+## Simulation: Results
+```{r, include=TRUE,echo=TRUE}
+load(".Rdata")
+colMeans(SimResults[,c(7,8,9)])
+colMeans(SimResults[,c(10,11,12)])
 
-## Simulation: Inverse Probability Weighting
-
-\begin{equation}
-\bar{x_{2}} = \frac{1}{r}\sum_{i = 1}^{r} w_{i}x_{i2}
-\end{equation}
-
-\begin{equation}
-w_{i} = \frac{r\pi_{i}^{-1}}{\sum_{j = 1}^{r}\pi_{j}^{-1}}
-\end{equation}
-
-where $\pi_{i}$ is obtained by regressing the indicator for missingness on $X_1$ using logistic regression.
-
+```
 
 ## Simulation: Single Imputation - Mean
 
@@ -222,51 +217,91 @@ x_{i2} & \text{if } x_{i2} \text{ is observed}\\
 \end{equation}
 
 
-## Simulation: Results
-```{r, include=TRUE,echo=TRUE}
+## Simulation: Single Imputation - Reg
+
+\begin{equation}
+\bar{x_{2}} = \frac{1}{n}\sum_{i = 1}^{n} x_{i2}*
+\end{equation}
+
+\begin{equation}
+x_{i2}* = \begin{cases}
+x_{i2} & \text{if } x_{i2} \text{ is observed}\\
+\widehat{x_{i2}} & \text{otherwise}\\
+\end{cases}
+\end{equation}
+
+Where $\widehat{x_{i2}}$ is the predicted value for $x_{i2}$ from regressing $X2$ on $X1$.
+
+## Simulation: Single Imputation Comparison
+```{r}
 load(".Rdata")
-colMeans(SimResults[,c(1,2,3)])
-colMeans(SimResults[,c(4,5,6)])
-colMeans(SimResults[,c(7,8,9)])
+plot(1, type="n", xlab="X1", ylab="X2", xlim=c(-2, 4), ylim=c(-2, 4),
+     main="Single Imputation")
+points(x=mydata[which(mydata$X4==1),]$X1,y=mydata[which(mydata$X4==1),]$X2,pch=19)
+
+abline(h=mean(mydata[which(mydata$X4==1),]$X2),col="Blue")
+points(x=mydata[which(mydata$X4==0),]$X1,
+       y=rep(mean(mydata[which(mydata$X4==1),]$X2),n-sum(mydata$X4)),
+       col="Blue",pch=19)
+
+abline(model5,col="red")
+points(x=mydata[which(mydata$X4==0),]$X1,
+       y=predict(model5,newdata=data.frame("X1"=mydata[which(mydata$X4==0),1])),
+       col="red",pch=19)
+
+abline(h=mean(completed5),col="Orange")
 
 ```
 
 
+## Simulation: Inverse Probability Weighting
 
-## Demonstrate how Multiple Impuation works?
+\begin{equation}
+\bar{x_{2}} = \frac{1}{r}\sum_{i = 1}^{r} w_{i}x_{i2}
+\end{equation}
+
+\begin{equation}
+w_{i} = \frac{r\pi_{i}^{-1}}{\sum_{j = 1}^{r}\pi_{j}^{-1}}
+\end{equation}
+
+where $\pi_{i} = \pi_{1}(x_{i})$ is obtained by regressing the indicator for missingness on $X_1$ using logistic regression.
 
 
 ## Inverse Probability Weighting
 ### Advantages
-- Easier to specify than full likelihood
+- Easier to use than Likelihood
+- Don't need to specify a complicated imputation model if there is structure to the data
 - Augmented techniques are consistent if at least one of the missing model or the regression model is correctly specified
 
 ### Disadvantages
 - Difficult to specify a missing model if the data are non-monotone
-- Less efficient than Multiple Imputation if the missingness model does not include partially observed data
+- Less efficient than Multiple Imputation
+
 
 ## Modelling Missing Data Probability
 - Logistic
+- Clustering and Empirical Likelihood
 - Multinomial with only a few missing patterns and lots of data
-- UMLE and CBE from Paper
-- Page 47 in Statistical Analysis with Missing Data, Weighting Class
+- UMLE and CBE from @SunBaoluo2017OIPW
 
 
 ## Logistic
 ```{r,include=TRUE}
 load(".Rdata")
 model1 = glm(X4~X1,data=data.frame(mydata),family=binomial(link="logit"))
-plot(mydata[,1],mydata[,4],xlab="X1",ylab="Missing Indicator")
+plot(mydata[,1],mydata[,4],xlab="X1",ylab="Missing Indicator",pch=19)
 curve(predict(model1,data.frame(X1=x),type="resp"),add=TRUE)
 
 ```
 
-## Multinomial
-
-## Classes
-
-## PAPER?
-
+## Clusters
+```{r,include=TRUE}
+load(".Rdata")
+model1 = glm(X4~X1,data=data.frame(mydata),family=binomial(link="logit"))
+plot(mydata[,1],mydata[,4],xlab="X1",ylab="Missing Indicator",pch=19)
+abline(v=0.3)
+abline(v=1.6)
+```
 
 
 ## References {.allowframebreaks}
