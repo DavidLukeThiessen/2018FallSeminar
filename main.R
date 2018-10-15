@@ -7,8 +7,8 @@ library(MASS)
 
 rm(list=ls())
 
-Sig = matrix(c(1,0.5,0.5,1),2,2)
 Mu = c(1,1)
+Sig = matrix(c(1,0.5,0.5,1),2,2)
 n = 30
 m = 1000
 
@@ -22,10 +22,10 @@ mydatagen=function(){
   MARPattern = rbinom(n=n,size=1,p=1-sapply(ExData1[,1],mylogit))
   MNARPattern = rbinom(n=n,size=1,p=1-sapply(ExData1[,2],mylogit))
   mydata = cbind(ExData1,MCARPattern,MARPattern,MNARPattern)
-  
+  colnames(mydata)=c("X1","X2","X3","X4","X5")
   # mean(sapply(ExData1[,1],mylogit))
   # mean(sapply(ExData1[,2],mylogit))
-  
+  mydata = data.frame(mydata)
   return(mydata)
 }
 
@@ -35,6 +35,7 @@ colnames(SimResults)=c("CC MCAR","CC MAR","CC MNAR","IPW MCAR","IPW MAR","IPW MN
                        "SI MCAR","SI MAR","SI MNAR")
 # SimResults
 
+set.seed(3)
 for(i in 1:m){
   mydata = mydatagen()
   # mydata
@@ -79,7 +80,7 @@ for(i in 1:m){
   # SimResults[i,6] = mean(mydata[which(mydata[,5]==1),2]/weight2[which(mydata[,5]==1)])
   
   # This tries the other weighting equation after (3.4) in SA with MD
-  model0 = glm(mydata[,3]~mydata[,1],family=binomial(link="logit"))
+  model0 = glm(X3 ~ X1,data=mydata,family=binomial(link="logit"))
   probs0 = predict.glm(model0,type='response')
   # probs0
   # 1/probs0
@@ -88,14 +89,14 @@ for(i in 1:m){
   # weight0
   # sum(weight0)
   
-  model1 = glm(mydata[,4]~mydata[,1],family=binomial(link="logit"))
+  model1 = glm(X4~X1,data=mydata,family=binomial(link="logit"))
   probs1 = predict.glm(model1,type='response')
   # probs1
   weight1 = sum(mydata[,4])*(1/probs1)/sum((1/probs1[which(mydata[,4]==1)]))
   # weight1
   # sum(weight1)
   
-  model2 = glm(mydata[,5]~mydata[,1],family=binomial(link="logit"))
+  model2 = glm(X5~X1,data=mydata,family=binomial(link="logit"))
   probs2 = predict.glm(model2,type='response')
   # probs2 
   weight2 = sum(mydata[,5])*(1/probs2)/sum((1/probs2[which(mydata[,5]==1)]))
@@ -122,19 +123,18 @@ for(i in 1:m){
   SimResults[i,9]=mean(completed3)
   
 }
-
+save.image()
 head(SimResults)
 
 colMeans(SimResults)
 apply(X=SimResults, MARGIN=2, FUN=sd)
 
 
+plot(mydata[,1],mydata[,4],xlab="X1",ylab="Missing Indicator")
+curve(predict(model1,data.frame(X1=x),type="resp"),add=TRUE)
+
+model1
 
 
-
-
-
-
-
-
+mydata
 

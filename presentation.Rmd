@@ -4,11 +4,18 @@ author: "David Luke Thiessen"
 date: "October 15, 2018"
 output: 
   beamer_presentation:
-   includes:
+    slide_level: 2
+    includes:
       in_header: headerpagenumbers.tex
+
 bibliography: bibliography.bibtex
 nocite: | 
   @LittleRoderickJ.A.2002SAwM
+  @RubinDonaldB.1976IaMD
+  @HorvitzD.G.1952AGoS
+  @SunBaoluo2017OIPW
+  @SchaferJosephL.2002MDOV
+  @SeamanShaunR2013Roip
 ---
 
 ```{r setup, include=FALSE}
@@ -21,8 +28,6 @@ knitr::opts_chunk$set(echo = FALSE)
 - Approaches for Analyzing Missing Data
 - Inverse Probability Weighting
 - Methods for Modelling Missing Data Probabilities
-
-
 
 
 ## Introduction
@@ -80,7 +85,7 @@ Each individual is an independent and identically distributed observation from t
 
 
 ## Background: Missing Data Patterns
-If the variables $X_i$ can be arranged such that $X_{(r+1)} \subset X_{(r)}$, then the data are said to have a monotone missing pattern. 
+If the variables $X_i$ can be arranged such that $X_{(r+1)} \subset X_{(r)}$, then the data are said to have a monotone missing pattern.
 
 ```{r}
 X = c(6,4,4,3,2)
@@ -133,7 +138,7 @@ Suppose that the data in question is $(X_1,X_2) \sim \text{N}(\mu,\Sigma)$, wher
 
 Let $X_1$ be always observed, and $X_2$ partially missing with the mechanism given by:
 
-- MCAR: $P(R=2|x,\gamma) = P(R=2) = 0.4$
+- MCAR: $P(R=2|x,\gamma) = P(R=2) = 0.3$
 
 - MAR: $P(R=2|x,\gamma) = P(R=2|x_1) = 1/(1+e^{x_1})$
 
@@ -151,58 +156,121 @@ for some constant $\sigma$ and all possible $x$.
 
 
 ## Approaches for Analyzing with Missing Data
-TODO: 
-
 - Complete Case Analysis (CC)
-    - Throw out the individuals with missing data, and do an analysis as if you had only measured n' individuals instead of the originally planned n.
-- Inverse Probability Weighting (IPW)
-    - Weight the different individuals differently in the analysis, making ones with rare observations carry more weight
-- Single Imputation (SI)
-    - Replace the missing values with other appropriately selected values.
-    - Sometimes the average is used. In many situations this is wrong.
-- Multiple Imputation (MI)
-    - Replace missing values with randomly (but appropriately) selected values, but repeat this many times and then combine the conclusions together in a principled way.
+    - Throw out the individuals with missing data, and do an analysis as if you had only measured "r" individuals instead of the originally planned "n".
     
-- Likelihood Methods?
+- Inverse Probability Weighting (IPW)
+    - Weight the different individuals differently in the analysis, making ones with rare observations carry more weight.
+    
+- Single Imputation (SI)
+    - Replace the missing values with new appropriately selected values.
+    
+- Multiple Imputation (MI)
+    - Replace missing values with appropriately selected values, but repeat this many (typically > 20 times) and then combine the conclusions together.
+    
+- Other Approaches: Maximum Likelihood 
 
 
-## Demonstration
-TODO: Everything after here, use the MVN example.
+## Other Slides giving details on these methods??
 
 
-## Show that CC is unbiased for MCAR
+## Simulation: Setting
+$(X_1,X_2) \sim \text{N}(\mu,\Sigma)$, $\mu = (1,1)$, $\Sigma = \bigl( \begin{smallmatrix} 1 & 0.5 \\ 0.5 & 1\end{smallmatrix}\bigr)$ 
+
+Let $X_1$ be always observed, and $X_2$ partially missing with the mechanism given by:
+
+- MCAR: $P(R=2|x,\gamma) = P(R=2) = 0.3$
+
+- MAR: $P(R=2|x,\gamma) = P(R=2|x_1) = 1/(1+e^{x_1})$
+
+- MNAR: $P(R=2|x,\gamma) = P(R=2|x_2) = 1/(1+e^{x_2})$
+
+$n = 30$, number of simulations $= 1000$
 
 
-## Show that CC is biased for MAR and MNAR
+## Simulation: Complete Case Method
+
+\begin{equation}
+\bar{x_{2}} = \frac{1}{r}\sum_{i = 1}^{r} x_{i2}
+\end{equation}
 
 
-## Demostrate how IPW can correct for MAR
+## Simulation: Inverse Probability Weighting
+
+\begin{equation}
+\bar{x_{2}} = \frac{1}{r}\sum_{i = 1}^{r} w_{i}x_{i2}
+\end{equation}
+
+\begin{equation}
+w_{i} = \frac{r\pi_{i}^{-1}}{\sum_{j = 1}^{r}\pi_{j}^{-1}}
+\end{equation}
+
+where $\pi_{i}$ is obtained by regressing the indicator for missingness on $X_1$ using logistic regression.
 
 
-## Show how IPW Improves MNAR
+## Simulation: Single Imputation - Mean
+
+\begin{equation}
+\bar{x_{2}} = \frac{1}{n}\sum_{i = 1}^{n} x_{i2}*
+\end{equation}
+
+\begin{equation}
+x_{i2}* = \begin{cases}
+x_{i2} & \text{if } x_{i2} \text{ is observed}\\
+\bar{x_{2}} = \frac{1}{r}\sum_{i = 1}^{r} x_{i2} & \text{otherwise}\\
+\end{cases}
+\end{equation}
 
 
-## Another example with MNAR where IPW cannot correct for bias.
+## Simulation: Results
+```{r, include=TRUE,echo=TRUE}
+load(".Rdata")
+colMeans(SimResults[,c(1,2,3)])
+colMeans(SimResults[,c(4,5,6)])
+colMeans(SimResults[,c(7,8,9)])
 
+```
 
-## Single Imputation - Doesn't correct the bias, gives a false sense of security by reducing the variance
 
 
 ## Demonstrate how Multiple Impuation works?
 
 
 ## Inverse Probability Weighting
-- Efficiency
+### Advantages
 - Easier to specify than full likelihood
-- Less compuation demanding?
+- Augmented techniques are consistent if at least one of the missing model or the regression model is correctly specified
 
+### Disadvantages
+- Difficult to specify a missing model if the data are non-monotone
+- Less efficient than Multiple Imputation if the missingness model does not include partially observed data
 
 ## Modelling Missing Data Probability
 - Logistic
 - Multinomial with only a few missing patterns and lots of data
 - UMLE and CBE from Paper
+- Page 47 in Statistical Analysis with Missing Data, Weighting Class
+
+
+## Logistic
+```{r,include=TRUE}
+load(".Rdata")
+model1 = glm(X4~X1,data=data.frame(mydata),family=binomial(link="logit"))
+plot(mydata[,1],mydata[,4],xlab="X1",ylab="Missing Indicator")
+curve(predict(model1,data.frame(X1=x),type="resp"),add=TRUE)
+
+```
+
+## Multinomial
+
+## Classes
+
+## PAPER?
 
 
 
-## References
+## References {.allowframebreaks}
+
+
+
 
