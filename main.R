@@ -155,16 +155,9 @@ colMeans(SimResults)
 apply(X=SimResults, MARGIN=2, FUN=sd)
 
 
-plot(mydata[,1],mydata[,4],xlab="X1",ylab="Missing Indicator")
-curve(predict(model1,data.frame(X1=x),type="resp"),add=TRUE)
+# plot(mydata[,1],mydata[,4],xlab="X1",ylab="Missing Indicator")
+# curve(predict(model1,data.frame(X1=x),type="resp"),add=TRUE)
+
 # model1
 
-
 # head(mydata)
-
-
-
-
-
-
-

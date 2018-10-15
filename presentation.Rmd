@@ -61,7 +61,7 @@ How should we calculate the estimate and confidence interval?
 
 Remark: Missingness is a nuisance, not the objective of scientific study.
 
-Question: Can auxillary information (like the age of the residents) be used to recover (or estimate) the missing information?
+Question: Can auxiliary information (like the age of the residents) be used to recover (or estimate) the missing information?
 
 
 ## Introduction: A Naive Approach
@@ -96,7 +96,7 @@ barplot(X,axes=FALSE,main="Monotone Missing",names.arg=c("X1","X2","X3","X4","X5
 
 
 ## Background: Missing Data Patterns
-If the variables are not monotone missing, then they are non-monontone missing.
+If the variables are not monotone missing, then they are non-monotone missing.
 
 ```{r}
 X = c(6,4,4,3,2)
@@ -203,40 +203,12 @@ colMeans(SimResults[,c(10,11,12)])
 
 ```
 
-## Simulation: Single Imputation - Mean
-
-\begin{equation}
-\bar{x_{2}} = \frac{1}{n}\sum_{i = 1}^{n} x_{i2}*
-\end{equation}
-
-\begin{equation}
-x_{i2}* = \begin{cases}
-x_{i2} & \text{if } x_{i2} \text{ is observed}\\
-\bar{x_{2}} = \frac{1}{r}\sum_{i = 1}^{r} x_{i2} & \text{otherwise}\\
-\end{cases}
-\end{equation}
-
-
-## Simulation: Single Imputation - Reg
-
-\begin{equation}
-\bar{x_{2}} = \frac{1}{n}\sum_{i = 1}^{n} x_{i2}*
-\end{equation}
-
-\begin{equation}
-x_{i2}* = \begin{cases}
-x_{i2} & \text{if } x_{i2} \text{ is observed}\\
-\widehat{x_{i2}} & \text{otherwise}\\
-\end{cases}
-\end{equation}
-
-Where $\widehat{x_{i2}}$ is the predicted value for $x_{i2}$ from regressing $X2$ on $X1$.
 
 ## Simulation: Single Imputation Comparison
 ```{r}
 load(".Rdata")
 plot(1, type="n", xlab="X1", ylab="X2", xlim=c(-2, 4), ylim=c(-2, 4),
-     main="Single Imputation")
+     main="Single Imputation - MAR")
 points(x=mydata[which(mydata$X4==1),]$X1,y=mydata[which(mydata$X4==1),]$X2,pch=19)
 
 abline(h=mean(mydata[which(mydata$X4==1),]$X2),col="Blue")
@@ -269,12 +241,12 @@ where $\pi_{i} = \pi_{1}(x_{i})$ is obtained by regressing the indicator for mis
 
 ## Inverse Probability Weighting
 ### Advantages
-- Easier to use than Likelihood
+- Easier to use than Likelihood approaches
 - Don't need to specify a complicated imputation model if there is structure to the data
 - Augmented techniques are consistent if at least one of the missing model or the regression model is correctly specified
 
 ### Disadvantages
-- Difficult to specify a missing model if the data are non-monotone
+- Difficult to specify a missingness model if the data are non-monotone
 - Less efficient than Multiple Imputation
 
 
@@ -282,7 +254,7 @@ where $\pi_{i} = \pi_{1}(x_{i})$ is obtained by regressing the indicator for mis
 - Logistic
 - Clustering and Empirical Likelihood
 - Multinomial with only a few missing patterns and lots of data
-- UMLE and CBE from @SunBaoluo2017OIPW
+- Unconstrained Maximum Likelihood and Constrained Bayesian Estimation from @SunBaoluo2017OIPW
 
 
 ## Logistic
@@ -290,7 +262,7 @@ where $\pi_{i} = \pi_{1}(x_{i})$ is obtained by regressing the indicator for mis
 load(".Rdata")
 model1 = glm(X4~X1,data=data.frame(mydata),family=binomial(link="logit"))
 plot(mydata[,1],mydata[,4],xlab="X1",ylab="Missing Indicator",pch=19)
-curve(predict(model1,data.frame(X1=x),type="resp"),add=TRUE)
+curve(predict(model1,data.frame(X1=x),type="resp"),add=TRUE,col="red")
 
 ```
 
