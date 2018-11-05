@@ -271,9 +271,18 @@ curve(predict(model1,data.frame(X1=x),type="resp"),add=TRUE,col="red")
 load(".Rdata")
 model1 = glm(X4~X1,data=data.frame(mydata),family=binomial(link="logit"))
 plot(mydata[,1],mydata[,4],xlab="X1",ylab="Missing Indicator",pch=19)
-abline(v=0.3)
+abline(v=0.4)
 abline(v=1.6)
+segments(x0=-1.5,y0=(1/6),x1=0.4,col="red")
+segments(x0=0.4,y0=(7/12),x1=1.6,col="red")
+segments(x0=1.6,y0=1,x1=3.1,col="red")
+
 ```
+
+## So what about Non-Monotone?
+
+
+## Future Work
 
 
 ## References {.allowframebreaks}
